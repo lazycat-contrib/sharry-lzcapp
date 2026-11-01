@@ -111,7 +111,9 @@ jobs:
                   license_text = content.extractfile(lic_paths[0]).read().decode()
 
               # No default admin:admin may ship; the fixed module gets real credentials.
-              assert 'admin:admin' not in conf
+              # The fixed module must take its secret from the template, never a literal.
+              assert '{{ADMIN_PASS}}' in conf
+              assert not [l for l in conf.splitlines() if l.strip().startswith('password =') and '{{' not in l]
               assert '{{ADMIN_USER}}' in conf and '{{ADMIN_PASS}}' in conf
               assert 'fixed {\n        enabled = {{FIXED_ENABLED}}' in conf or '{{FIXED_ENABLED}}' in conf
               assert 'mode = "closed"' in conf, 'self-service signup must stay closed'
