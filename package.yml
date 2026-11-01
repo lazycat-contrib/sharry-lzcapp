@@ -1,0 +1,18 @@
+package: community.lazycat.app.sharry
+version: 1.17.0
+name: Sharry
+description: "Share files with expiring links and receive uploads through simple alias pages."
+min_os_version: "1.6.0"
+homepage: https://github.com/eikek/sharry
+author: eikek
+license: GPL-3.0
+permissions:
+  required:
+    - net.internet
+locales:
+  zh:
+    name: Sharry
+    description: "文件分享服务：生成带有效期和密码的分享链接，也能用别名页面接收别人上传的文件。"
+  en:
+    name: Sharry
+    description: "Share files with expiring links and receive uploads through simple alias pages."

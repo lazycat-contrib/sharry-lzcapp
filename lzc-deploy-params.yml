@@ -1,0 +1,21 @@
+params:
+  - id: admin_user
+    type: string
+    name: Admin username
+    description: "Administrator account for Sharry. Letters, digits and _ . @ - only. No default admin:admin account ships with this package."
+    default_value: admin
+    optional: false
+  - id: admin_secret
+    type: secret
+    name: Admin secret
+    description: "At least 12 characters, letters, digits and _ . ~ ! @ # % ^ + = - only. Rendered into a tmpfs config at container start; never stored in the package."
+    default_value: "$random(len=24)"
+    optional: false
+locales:
+  zh:
+    admin_user:
+      name: 管理员用户名
+      description: Sharry 管理员账号，只能用字母、数字和 _ . @ -。本包不包含默认的 admin:admin 账号。
+    admin_secret:
+      name: 管理员密码
+      description: 至少 12 位，只能用字母、数字和 _ . ~ ! @ # % ^ + = -。容器启动时渲染到内存临时文件，不随包发布。

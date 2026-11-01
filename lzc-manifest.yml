@@ -1,0 +1,46 @@
+application:
+  subdomain: sharry
+  multi_instance: false
+  upstreams:
+    - location: /package-licenses/
+      backend: file:///lzcapp/pkg/content/licenses/
+    - location: /
+      backend: http://sharry:9090/
+
+services:
+  sharry:
+    # upstream: eikek0/sharry:v1.17.0
+    image: docker.1ms.run/eikek0/sharry:v1.17.0
+    # The upstream image runs as uid/gid 10001; run_as maps the persistent
+    # directory owner to that same identity so the H2 database is writable.
+    # run_as is mutually exclusive with a service-level setup_script.
+    run_as: "10001:10001"
+    environment:
+      - |-
+        SHARRY_ADMIN_USER={{ .U.admin_user | replace "\r" "" | replace "\n" "" }}
+      - |-
+        SHARRY_ADMIN_PASS={{ .U.admin_secret | replace "\r" "" | replace "\n" "" }}
+      - |-
+        SHARRY_BASE_URL=https://{{ .S.AppDomain }}
+    command: sh /lzcapp/pkg/content/start.sh
+    binds:
+      - /lzcapp/var/data:/data
+
+usage: |
+  Sharry 是文件分享服务：把文件生成带有效期、可设密码的分享链接，也能创建别名页面接收别人上传。
+
+  使用方法：
+  1. 打开应用，用部署参数里的管理员用户名和密码登录。
+  2. 在「Shares」里上传文件生成分享链接；链接可设置有效期、下载次数和密码。
+  3. 需要别人给你传文件时，创建一个 Alias 页面，把链接发出去即可。
+
+  数据与安全：
+  - 账号、分享记录和上传的文件都保存在 /data（应用数据目录）里，卸载应用会一并删除，请提前备份。
+  - 本包没有默认的 admin:admin 账号：管理员凭据来自部署参数，并在容器启动时校验后渲染到临时目录。
+  - 应用内部注册通道已关闭，不能自助注册新账号；需要多加账号时由管理员在应用内创建。
+  - 应用经懒猫入口鉴权访问，未开放无需登录的接口路径。
+
+  说明：
+  - 管理员用户名只允许字母、数字和 _ . @ -；密码至少 12 位，支持字母数字和 _ . ~ ! @ # % ^ + = -。
+  - 修改部署参数后需要重新部署才会生效。
+  - 未做真机验证：登录、上传、分享链接生成与下载、别名收件、以及重启后持久化均未在设备上实测。
