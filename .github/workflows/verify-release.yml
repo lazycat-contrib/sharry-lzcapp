@@ -113,7 +113,11 @@ jobs:
               # No default admin:admin may ship; the fixed module gets real credentials.
               # The fixed module must take its secret from the template, never a literal.
               assert '{{ADMIN_PASS}}' in conf
-              assert not [l for l in conf.splitlines() if l.strip().startswith('password =') and '{{' not in l]
+              # Only the fixed-auth block carries the account secret; the empty
+              # H2 database secret must not be mistaken for a hard-coded login.
+              auth_start = conf.index('fixed {')
+              auth_block = conf[auth_start:conf.index('signup {', auth_start)]
+              assert not [l for l in auth_block.splitlines() if l.strip().startswith('password =') and '{{' not in l]
               assert '{{ADMIN_USER}}' in conf and '{{ADMIN_PASS}}' in conf
               assert 'fixed {\n        enabled = {{FIXED_ENABLED}}' in conf or '{{FIXED_ENABLED}}' in conf
               assert 'mode = "closed"' in conf, 'self-service signup must stay closed'
